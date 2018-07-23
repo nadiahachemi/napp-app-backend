@@ -14,7 +14,7 @@ const passportSetup = require("./passort/setup");
 
 mongoose.Promise = Promise;
 mongoose
-  .connect('mongodb://localhost/napp-app-backend', {useMongoClient: true})
+  .connect(process.env.MONGODB_URI, {useMongoClient: true})
   .then(() => {
     console.log('Connected to Mongo!')
   }).catch(err => {
@@ -56,8 +56,9 @@ passportSetup(app);
 const userRouter = require('./routes/user.js');
 app.use('/api', userRouter);
 
-// const index = require('./routes/index');
-// app.use('/', index);
+app.use((requestAnimationFrame, res, next)=>{
+  res.sendFile(`${__dirname}/public/index.html`);
+})
 
 
 module.exports = app;
