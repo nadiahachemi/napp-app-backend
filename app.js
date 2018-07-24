@@ -58,7 +58,7 @@ app.use('/api', userRouter);
 
 app.use((requestAnimationFrame, res, next)=>{
   res.sendFile(`${__dirname}/public/index.html`);
-})
+});
 
 
 module.exports = app;

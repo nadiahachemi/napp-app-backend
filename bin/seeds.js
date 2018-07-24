@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const mongoose = require("mongoose");
 const User = require("../models/user-model.js");
 const Product = require("../models/products-models.js");
@@ -6,7 +8,7 @@ const Routine= require("../models/routine-model.js");
 
 mongoose.Promise = Promise;
 mongoose
-    .connect("mongodb://localhost/napp-app-backend", { useMongoClient: true })
+    .connect(process.env.MONGODB_URI, { useMongoClient: true })
     .then(() => {
         console.log('Connected to Mongo!')
     }).catch(err => {
