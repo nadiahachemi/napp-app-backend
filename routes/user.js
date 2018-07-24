@@ -4,6 +4,7 @@ const bcrypt             = require("bcrypt");
 const User               = require("../models/user-model.js");
 const Product            = require("../models/products-models.js");
 const upload             = require('../configs/multer');
+const Routine            = require ('../models/routine-model.js')
 
 const router = express.Router();
 
@@ -110,7 +111,7 @@ router.delete("/logout", (req, res, next) => {
 
 router.post("/curls-infos", (req, res, next) => {
   console.log("hello")
-    const { id } = req.user;
+    let { id } = req.user;
     const { hairType, hairLength,  hairVolume, hairMoisture } = req.body;
   
     User.findByIdAndUpdate(
@@ -128,7 +129,7 @@ router.post("/curls-infos", (req, res, next) => {
   });
 
 router.get("/wish-list", (req, res, next)=>{
-  const { id } = req.user;
+  let { id } = req.user;
   User.findById(id)
   .populate("wishList")
   .then(userDoc => {
@@ -160,6 +161,101 @@ router.get("/wish-list/search", (req, res, next)=>{
     next(err);
   });
 });
+
+router.post("/wish-list/add", (req, res, next)=>{
+  let id = req.user._id;
+
+  User.findByIdAndUpdate(
+    id,
+    {$push: { wishList: req.body.oneProduct._id}},
+    { new: true }
+  )
+  .populate("wishList")
+  .then(resultUser=>{
+    resultUser.encryptedPassword = undefined;
+    res.json(resultUser)
+  })
+  .catch((err)=>{
+    next(err);
+  });
+})
+
+router.post("/wish-list/pull", (req, res, next)=>{
+  let id = req.user._id;
+  console.log(req.body.oneWish)
+  User.findByIdAndUpdate(
+    id,
+    {$pull: { wishList: req.body.oneWish._id}},
+    { new: true }
+  )
+  .populate("wishList")
+  .then(resultUser=>{
+    resultUser.encryptedPassword = undefined;
+    res.json(resultUser)
+  })
+  .catch((err)=>{
+    next(err);
+  });
+})
+
+
+router.get("/routines", (req, res, next)=>{
+  Routine.find()
+  .then((resultRoutine)=>{
+    res.json(resultRoutine)})
+    .catch((err) => {
+      next(err);
+    });
+  });
+
+
+router.get("/user-routines", (req, res, next)=>{
+  const { id } = req.user;
+  User.findById(id)
+  .populate("routines")
+  .then(userDoc => {
+    res.locals.UserItem = userDoc
+    res.json(userDoc);
+  })
+  .catch((err) => {
+    next(err);
+  });
+});
+
+router.post("/routines/add", (req, res, next)=>{
+  let id = req.user._id;
+
+  User.findByIdAndUpdate(
+    id,
+    {$push: { routines: req.body.oneRoutine._id}},
+    { new: true }
+  )
+  .populate("routines")
+  .then(resultUser=>{
+    resultUser.encryptedPassword = undefined;
+    res.json(resultUser)
+  })
+  .catch((err)=>{
+    next(err);
+  });
+})
+
+router.post("/routines/pull", (req, res, next)=>{
+  let id = req.user._id;
+  User.findByIdAndUpdate(
+    id,
+    {$pull: { routines: req.body.oneRoutine._id}},
+    { new: true }
+  )
+  .populate("wishList")
+  .then(resultUser=>{
+    resultUser.encryptedPassword = undefined;
+    res.json(resultUser)
+  })
+  .catch((err)=>{
+    next(err);
+  });
+})
 
 
 module.exports= router;

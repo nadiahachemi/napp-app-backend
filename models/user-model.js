@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const Product = require("../models/products-models.js");
+const Routine = require("../models/routine-model.js")
 
 
 const userSchema = new Schema({
@@ -17,7 +18,8 @@ const userSchema = new Schema({
   hairVolume: {type:String, enum:["extra thin", "thin", "normal", "thick", "extra thick"]},
   hairMoisture: {type: String, enum:["extra dry", "dry", "normal", "greassy", "extra greassy"]},
   pictureUrl:{type:String},
-  wishList:[{type:Schema.ObjectId, ref: 'Product' }]
+  wishList:[{type:Schema.ObjectId, ref: 'Product' }],
+  routines: [{type:Schema.ObjectId, ref:'Routine'}]
   }
 , {
   timestamps: true
