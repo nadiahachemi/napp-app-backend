@@ -6,6 +6,9 @@ const Product = require("../models/products-models.js");
 const Routine= require("../models/routine-model.js");
 
 
+
+
+
 mongoose.Promise = Promise;
 mongoose
     .connect(process.env.MONGODB_URI, { useMongoClient: true })
@@ -24,4 +27,4 @@ mongoose
     .catch((err) => {
         console.log('Create routine Fail 💩', err)
     });
- });    
+ })

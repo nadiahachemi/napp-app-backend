@@ -110,7 +110,6 @@ router.delete("/logout", (req, res, next) => {
 
 
 router.post("/curls-infos", (req, res, next) => {
-  console.log("hello")
     let { id } = req.user;
     const { hairType, hairLength,  hairVolume, hairMoisture } = req.body;
   
@@ -141,7 +140,7 @@ router.get("/wish-list", (req, res, next)=>{
   });
 });
 
-router.get("/wish-list/search", (req, res, next)=>{
+router.post("/wish-list/search", (req, res, next)=>{
   const hairType = req.user.hairType;
   const {searchTerm} =req.body;
 
