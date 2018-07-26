@@ -19,9 +19,13 @@ const userSchema = new Schema({
   hairMoisture: {type: String, enum:["extra dry", "dry", "normal", "greassy", "extra greassy"]},
   pictureUrl:{type:String},
   wishList:[{type:Schema.ObjectId, ref: 'Product' }],
-  routines: [{type:Schema.ObjectId, ref:'Routine'}]
-  }
-, {
+  routines: [
+    {
+      info: {type:Schema.ObjectId, ref:'Routine'},
+      when: {type: String}
+    }
+  ]
+}, {
   timestamps: true
 });
 

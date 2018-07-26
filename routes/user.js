@@ -127,6 +127,25 @@ router.post("/curls-infos", (req, res, next) => {
     });
   });
 
+  router.post("/nappy-routine/when", (req, res, next)=>{
+
+    const id= req.user._id;
+    const {when}= req.body.whenForm;
+   
+    User.findOneAndUpdate(
+      {_id: id, "routines.info": req.body.oneRoutine._id},
+      {$set: {"routines.$.when":  when}},
+      { new: true })
+    .populate("routines.info")
+    .then(resultUser =>{
+    resultUser.encryptedPassword = undefined;
+    res.json(resultUser);
+  })
+  .catch(err=>{
+    next(err);
+  })
+});
+
 router.get("/wish-list", (req, res, next)=>{
   let { id } = req.user;
   User.findById(id)
@@ -211,7 +230,7 @@ router.get("/routines", (req, res, next)=>{
 router.get("/user-routines", (req, res, next)=>{
   const { id } = req.user;
   User.findById(id)
-  .populate("routines")
+  .populate("routines.info")
   .then(userDoc => {
     res.locals.UserItem = userDoc
     res.json(userDoc);
@@ -226,10 +245,10 @@ router.post("/routines/add", (req, res, next)=>{
 
   User.findByIdAndUpdate(
     id,
-    {$push: { routines: req.body.oneRoutine._id}},
+    {$push: { routines: { info: req.body.oneRoutine._id}}},
     { new: true }
   )
-  .populate("routines")
+  .populate("routines.info")
   .then(resultUser=>{
     resultUser.encryptedPassword = undefined;
     res.json(resultUser)
@@ -243,7 +262,7 @@ router.post("/routines/pull", (req, res, next)=>{
   let id = req.user._id;
   User.findByIdAndUpdate(
     id,
-    {$pull: { routines: req.body.oneRoutine._id}},
+    {$pull: { routines: { info: req.body.oneRoutine._id}}},
     { new: true }
   )
   .populate("wishList")
