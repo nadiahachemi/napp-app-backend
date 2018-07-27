@@ -138,7 +138,7 @@ router.post("/curls-infos", (req, res, next) => {
       { new: true })
     .populate("routines.info")
     .then(resultUser =>{
-    resultUser.encryptedPassword = undefined;
+    //resultUser.encryptedPassword = undefined;
     res.json(resultUser);
   })
   .catch(err=>{
@@ -265,7 +265,7 @@ router.post("/routines/pull", (req, res, next)=>{
     {$pull: { routines: { info: req.body.oneRoutine._id}}},
     { new: true }
   )
-  .populate("wishList")
+  .populate("routines.info")
   .then(resultUser=>{
     resultUser.encryptedPassword = undefined;
     res.json(resultUser)
