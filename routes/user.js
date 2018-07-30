@@ -1,63 +1,58 @@
-const multer             = require('multer');
+const multer             = require("multer");
 const express            = require("express");
 const bcrypt             = require("bcrypt");
 const User               = require("../models/user-model.js");
 const Product            = require("../models/products-models.js");
-const upload             = require('../configs/multer');
+const upload             = require ("../configs/multer.js");
 const Routine            = require ('../models/routine-model.js')
+const cloudinary         = require ("cloudinary");
+const cloudinaryStorage  = require ("multer-storage-cloudinary");
 
 const router = express.Router();
 
 
 
-  router.post("/signup", (req, res, next) => {
-    const { name, email, originalPassword} = req.body;//, pictureUrl
-    // let { secureUrl} = `/uploads/${req.file.filename}`
+cloudinary.config({
+  cloud_name: process.env.cloudinary_name,
+  api_key: process.env.cloudinary_key,
+  api_secret: process.env.cloudinary_secret
+});
 
-  
-    if (originalPassword === "" || originalPassword.match(/[0-9]/) === null) {
-      // create an Error object for "next(err)"
-      const err = new Error("Password can't be blank and must have a number");
-      next(err);
-      return;
-    }
-  
-    // we are ready to save the user if we get this far
-    const encryptedPassword = bcrypt.hashSync(originalPassword, 10);
-  
-    User.create({ name, email, encryptedPassword })//,pictureUrl
-      .then((userDoc) => {
-        // log the user in immediately after signing up
-        req.logIn(userDoc, () => {
-          // hide encryptedPassword before sending the JSON (it's a security risk)
-          userDoc.encryptedPassword = undefined;
-          res.json({ userDoc });
-        });
-      })
-      .catch((err) => {
-        next(err);
+const storage = cloudinaryStorage({
+  cloudinary,
+  folder: "user-pictures"
+});
+const uploader = multer({ storage });
+
+
+router.post("/signup", (req, res, next) => {
+  const { name, email, originalPassword} = req.body;//, pictureUrl
+  // let { secureUrl} = `/uploads/${req.file.filename}`
+
+
+  if (originalPassword === "" || originalPassword.match(/[0-9]/) === null) {
+    // create an Error object for "next(err)"
+    const err = new Error("Password can't be blank and must have a number");
+    next(err);
+    return;
+  }
+
+  // we are ready to save the user if we get this far
+  const encryptedPassword = bcrypt.hashSync(originalPassword, 10);
+
+  User.create({ name, email, encryptedPassword })//,pictureUrl
+    .then((userDoc) => {
+      // log the user in immediately after signing up
+      req.logIn(userDoc, () => {
+        // hide encryptedPassword before sending the JSON (it's a security risk)
+        userDoc.encryptedPassword = undefined;
+        res.json({ userDoc });
       });
-  })
-
-  // router.post('/signup', upload.single('file'), function(req, res) {
-  //   const user = new User({
-  //     name: req.body.name,
-  //     email: req.body.email,
-  //     originalPassword: req.body.originalPassword,
-  //     pictureUrl: `/uploads/${req.file.filename}`,
-  //   });
-  
-  //   user.save((err) => {
-  //     if (err) {
-  //       return res.send(err);
-  //     }
-  
-  //     return res.json({
-  //       message: 'New user created!',
-  //       user: user
-  //     });
-  //   });
-  // });
+    })
+    .catch((err) => {
+      next(err);
+    });
+})
 
 
   router.post("/login", (req, res, next) => {
@@ -274,6 +269,42 @@ router.post("/routines/pull", (req, res, next)=>{
     next(err);
   });
 })
+
+router.get("/product/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  Product.findById(id)
+    .then((productDoc) => {
+      if (!productDoc) {
+        // show 404 if no phone was found
+        next();
+        return;
+      }
+
+      res.json(productDoc);
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
+
+router.get("/routine/:id", (req, res, next) => {
+  const { id } = req.params;
+
+  Routine.findById(id)
+    .then((routineDoc) => {
+      if (!routineDoc) {
+        // show 404 if no phone was found
+        next();
+        return;
+      }
+
+      res.json(routineDoc);
+    })
+    .catch((err) => {
+      next(err);
+    });
+});
 
 
 module.exports= router;
